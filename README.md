@@ -12,6 +12,12 @@ The app is designed for Apple Silicon Macs and supports username/password authen
 > [!IMPORTANT]
 > This project is not affiliated with, endorsed by, or supported by Palo Alto Networks. Your organization may block third-party VPN clients or require additional device-compliance checks.
 
+## Screenshot
+
+<p align="center">
+  <img src="Screenshots/openconnect-vpn-menu.png" alt="OpenConnect VPN menu bar interface" width="380">
+</p>
+
 ## Features
 
 - Native SwiftUI menu bar interface without a Dock icon.

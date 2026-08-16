@@ -1,0 +1,50 @@
+name: Build macOS app
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Apple Silicon app
+    runs-on: macos-26
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Show toolchain
+        run: |
+          swift --version
+          xcodebuild -version
+
+      - name: Run core tests
+        run: swift test
+
+      - name: Build and package arm64 app
+        run: ./Scripts/package-app.sh
+
+      - name: Verify architecture and bundle
+        run: |
+          file "dist/OpenConnect VPN.app/Contents/MacOS/OpenConnectVPN"
+          file "dist/OpenConnect VPN.app/Contents/MacOS/OpenConnectVPN" | grep -q "arm64"
+          file "dist/OpenConnect VPN.app/Contents/MacOS/OpenConnectLauncher"
+          file "dist/OpenConnect VPN.app/Contents/MacOS/OpenConnectLauncher" | grep -q "arm64"
+          plutil -lint "dist/OpenConnect VPN.app/Contents/Info.plist"
+          codesign --verify --deep --strict "dist/OpenConnect VPN.app"
+
+      - name: Upload app
+        uses: actions/upload-artifact@v7
+        with:
+          name: OpenConnectVPN-arm64
+          path: dist/OpenConnectVPN-arm64.zip
+          if-no-files-found: error
+          retention-days: 30

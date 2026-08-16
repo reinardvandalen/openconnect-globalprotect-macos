@@ -8,10 +8,11 @@ public enum KeychainPasswordStoreError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .invalidPasswordData:
-            return "Het wachtwoord kon niet veilig worden gecodeerd."
+            return L10n.text("error.keychain_invalid_data")
         case .unexpectedStatus(let status):
-            let detail = SecCopyErrorMessageString(status, nil) as String? ?? "foutcode \(status)"
-            return "macOS Sleutelhanger gaf een fout: \(detail)."
+            let detail = SecCopyErrorMessageString(status, nil) as String?
+                ?? L10n.format("error.code", status)
+            return L10n.format("error.keychain_status", detail)
         }
     }
 }

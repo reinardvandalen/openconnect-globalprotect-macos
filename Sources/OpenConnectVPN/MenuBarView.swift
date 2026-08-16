@@ -1,4 +1,5 @@
 import AppKit
+import OpenConnectCore
 import SwiftUI
 
 private struct MenuBarContentHeightKey: PreferenceKey {
@@ -108,7 +109,7 @@ struct MenuBarView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text("OpenConnect VPN")
                     .font(.system(size: 17, weight: .bold, design: .rounded))
-                Text("GlobalProtect voor macOS")
+                Text(L10n.text("app.subtitle"))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -152,18 +153,18 @@ struct MenuBarView: View {
 
     private var configurationCard: some View {
         VStack(alignment: .leading, spacing: 13) {
-            Label("Verbinding", systemImage: "network")
+            Label(L10n.text("section.connection"), systemImage: "network")
                 .font(.system(size: 13, weight: .semibold, design: .rounded))
 
             VStack(alignment: .leading, spacing: 6) {
-                Text("GlobalProtect-portal")
+                Text(L10n.text("field.portal.label"))
                     .font(.caption2.weight(.medium))
                     .foregroundStyle(.secondary)
 
                 HStack(spacing: 8) {
                     Image(systemName: "globe.europe.africa.fill")
                         .foregroundStyle(.blue)
-                    TextField("vpn.example.org", text: $model.portalAddress)
+                    TextField(L10n.text("field.portal.placeholder"), text: $model.portalAddress)
                         .textFieldStyle(.plain)
                         .disabled(model.phase.isBusy || model.phase.isConnected)
                         .onSubmit { if model.canConnect { model.connect() } }
@@ -174,14 +175,14 @@ struct MenuBarView: View {
             }
 
             VStack(alignment: .leading, spacing: 6) {
-                Text("Gebruikersnaam")
+                Text(L10n.text("field.username.label"))
                     .font(.caption2.weight(.medium))
                     .foregroundStyle(.secondary)
 
                 HStack(spacing: 8) {
                     Image(systemName: "person.fill")
                         .foregroundStyle(.blue)
-                    TextField("Laat leeg bij browserlogin", text: $model.username)
+                    TextField(L10n.text("field.browser.placeholder"), text: $model.username)
                         .textFieldStyle(.plain)
                         .disabled(model.phase.isBusy || model.phase.isConnected)
                 }
@@ -191,14 +192,14 @@ struct MenuBarView: View {
             }
 
             VStack(alignment: .leading, spacing: 6) {
-                Text("Wachtwoord")
+                Text(L10n.text("field.password.label"))
                     .font(.caption2.weight(.medium))
                     .foregroundStyle(.secondary)
 
                 HStack(spacing: 8) {
                     Image(systemName: "key.fill")
                         .foregroundStyle(.blue)
-                    SecureField("Laat leeg bij browserlogin", text: $model.password)
+                    SecureField(L10n.text("field.browser.placeholder"), text: $model.password)
                         .textFieldStyle(.plain)
                         .disabled(model.phase.isBusy || model.phase.isConnected)
                         .onSubmit { if model.canConnect { model.connect() } }
@@ -215,12 +216,12 @@ struct MenuBarView: View {
                 )
             ) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Onthoud wachtwoord")
+                    Text(L10n.text("toggle.remember.title"))
                         .font(.system(size: 13, weight: .medium))
                     Text(
                         model.hasStoredPassword
-                            ? "Beveiligd in macOS Sleutelhanger"
-                            : "Bewaar na een succesvolle aanmelding"
+                            ? L10n.text("toggle.remember.stored")
+                            : L10n.text("toggle.remember.description")
                     )
                         .font(.caption2)
                         .foregroundStyle(.secondary)
@@ -239,9 +240,9 @@ struct MenuBarView: View {
                 )
             ) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Open bij inloggen")
+                    Text(L10n.text("toggle.login.title"))
                         .font(.system(size: 13, weight: .medium))
-                    Text("Verschijnt automatisch in de menubalk")
+                    Text(L10n.text("toggle.login.description"))
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
@@ -255,7 +256,7 @@ struct MenuBarView: View {
 
     private var mfaCard: some View {
         VStack(alignment: .leading, spacing: 11) {
-            Label("Tweestapsverificatie", systemImage: "checkmark.shield.fill")
+            Label(L10n.text("mfa.title"), systemImage: "checkmark.shield.fill")
                 .font(.system(size: 13, weight: .semibold, design: .rounded))
                 .foregroundStyle(.orange)
 
@@ -268,10 +269,10 @@ struct MenuBarView: View {
             HStack(spacing: 8) {
                 Image(systemName: "number")
                     .foregroundStyle(.orange)
-                SecureField("MFA-code", text: $model.mfaCode)
+                SecureField(L10n.text("mfa.placeholder"), text: $model.mfaCode)
                     .textFieldStyle(.plain)
                     .onSubmit { if model.canSubmitMFA { model.submitMFA() } }
-                Button("Bevestig") {
+                Button(L10n.text("button.confirm")) {
                     model.submitMFA()
                 }
                 .buttonStyle(.borderedProminent)
@@ -288,19 +289,19 @@ struct MenuBarView: View {
 
     private var dependencyCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Label("OpenConnect ontbreekt", systemImage: "shippingbox.fill")
+            Label(L10n.text("dependency.title"), systemImage: "shippingbox.fill")
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(.orange)
 
-            Text("Installeer de Homebrew-versie voor Apple Silicon en controleer daarna opnieuw.")
+            Text(L10n.text("dependency.description"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
             HStack {
-                Button("Kopieer brew-commando") {
+                Button(L10n.text("button.copy_brew")) {
                     model.copyHomebrewCommand()
                 }
-                Button("Controleer opnieuw") {
+                Button(L10n.text("button.recheck")) {
                     model.refreshOpenConnect()
                 }
             }
@@ -316,7 +317,7 @@ struct MenuBarView: View {
                 Button {
                     model.cancelConnection()
                 } label: {
-                    Label("Annuleer", systemImage: "xmark")
+                    Label(L10n.text("button.cancel"), systemImage: "xmark")
                 }
                 .buttonStyle(VPNPrimaryButtonStyle(tint: .secondary))
             } else if model.phase.isBusy {
@@ -354,17 +355,17 @@ struct MenuBarView: View {
     }
 
     private var details: some View {
-        DisclosureGroup("Technische details", isExpanded: $showDetails) {
+        DisclosureGroup(L10n.text("details.title"), isExpanded: $showDetails) {
             VStack(alignment: .leading, spacing: 8) {
                 if let path = model.openConnectPath {
                     Label(path, systemImage: "terminal.fill")
                         .textSelection(.enabled)
                 } else {
-                    Label("OpenConnect niet gevonden", systemImage: "terminal")
+                    Label(L10n.text("details.openconnect_missing"), systemImage: "terminal")
                 }
 
                 if model.recentLogs.isEmpty {
-                    Text("Nog geen gebeurtenissen.")
+                    Text(L10n.text("details.no_events"))
                         .foregroundStyle(.secondary)
                 } else {
                     Text(model.recentLogs.suffix(8).joined(separator: "\n"))
@@ -374,7 +375,7 @@ struct MenuBarView: View {
                 }
 
                 if model.launchAtLogin {
-                    Button("Open inlogonderdelen") {
+                    Button(L10n.text("button.open_login_items")) {
                         model.openLoginItemSettings()
                     }
                     .buttonStyle(.link)
@@ -391,10 +392,10 @@ struct MenuBarView: View {
         HStack {
             Label(
                 model.hasStoredPassword
-                    ? "Wachtwoord beveiligd in Sleutelhanger"
+                    ? L10n.text("footer.password.secure")
                     : model.rememberPassword
-                        ? "Wachtwoord wordt na aanmelden bewaard"
-                        : "Wachtwoord wordt niet bewaard",
+                        ? L10n.text("footer.password.pending")
+                        : L10n.text("footer.password.not_stored"),
                 systemImage: model.rememberPassword ? "key.fill" : "lock.fill"
             )
                 .font(.caption2)
@@ -402,7 +403,7 @@ struct MenuBarView: View {
 
             Spacer()
 
-            Button("Sluit app") {
+            Button(L10n.text("button.quit")) {
                 model.quit()
             }
             .buttonStyle(.plain)

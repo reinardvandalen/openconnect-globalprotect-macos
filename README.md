@@ -18,9 +18,14 @@ The app is designed for Apple Silicon Macs and supports username/password authen
   <img src="Screenshots/openconnect-vpn-menu.png" alt="OpenConnect VPN menu bar interface" width="380">
 </p>
 
+## Languages
+
+The app is available in English, Dutch, and German. It automatically follows your macOS language preference. You can also choose a language specifically for OpenConnect VPN in **System Settings → General → Language & Region → Applications**.
+
 ## Features
 
 - Native SwiftUI menu bar interface without a Dock icon.
+- Localized interface in English, Dutch, and German.
 - Clear connected, disconnected, connecting, and error states.
 - Username/password authentication with a separate MFA prompt.
 - Browser-based SAML authentication through the default macOS browser.
@@ -58,12 +63,10 @@ The downloadable build is ad hoc signed, but it is not notarized with a paid App
 
 ## Usage
 
-The current interface is in Dutch. The most important controls are included below with their English meaning.
-
 1. Open **OpenConnect VPN** from the Applications folder. A shield icon appears in the menu bar.
 2. Enter the GlobalProtect portal, for example `vpn.example.org` or `https://vpn.example.org`.
-3. Enter your username and password for a regular GlobalProtect login. Enable **Onthoud wachtwoord** (*Remember password*) if you want to store the password in macOS Keychain. Leave the password empty for browser-based SAML authentication.
-4. Select **Verbind met VPN** (*Connect VPN*).
+3. Enter your username and password for a regular GlobalProtect login. Enable **Remember password** if you want to store the password in macOS Keychain. Leave the password empty for browser-based SAML authentication.
+4. Select **Connect VPN**.
 5. Enter the MFA code when prompted, or complete authentication in the default browser.
 6. Approve the macOS administrator prompt to start the protected tunnel.
 

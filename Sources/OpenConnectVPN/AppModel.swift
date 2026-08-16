@@ -52,7 +52,7 @@ final class AppModel: ObservableObject {
             } catch {
                 rememberPassword = false
                 UserDefaults.standard.set(false, forKey: Keys.rememberPassword)
-                notice = "Het bewaarde wachtwoord kon niet worden geladen: \(error.localizedDescription)"
+                notice = L10n.format("notice.password_load_failed", error.localizedDescription)
             }
         }
         openConnectPath = service.locateOpenConnect()
@@ -91,15 +91,15 @@ final class AppModel: ObservableObject {
     var phaseDetail: String {
         guard phase == .authenticating else { return phase.detail }
         if isAwaitingMFA {
-            return "Vul de verificatiecode in om de aanmelding af te ronden."
+            return L10n.text("auth.mfa.detail")
         }
         return usesPasswordAuthentication
-            ? "Je inloggegevens worden gecontroleerd."
-            : "Rond het inloggen af in je standaardbrowser."
+            ? L10n.text("auth.credentials_checking")
+            : L10n.text("auth.browser_continue")
     }
 
     var primaryButtonTitle: String {
-        phase.isConnected ? "Verbreek VPN" : "Verbind met VPN"
+        phase.isConnected ? L10n.text("button.disconnect") : L10n.text("button.connect")
     }
 
     var primaryButtonSymbol: String {
@@ -132,7 +132,7 @@ final class AppModel: ObservableObject {
 
         guard let binary = service.locateOpenConnect() else {
             openConnectPath = nil
-            phase = .failed("Installeer OpenConnect eerst via Homebrew.")
+            phase = .failed(L10n.text("error.install_openconnect"))
             return
         }
 
@@ -145,7 +145,7 @@ final class AppModel: ObservableObject {
         if !rememberPassword {
             password = ""
         }
-        appendLog("Authenticatie gestart voor \(endpoint.host ?? endpoint.absoluteString).")
+        appendLog(L10n.format("log.authentication_started", endpoint.host ?? endpoint.absoluteString))
         phase = .authenticating
 
         connectionTask = Task { [weak self] in
@@ -160,7 +160,7 @@ final class AppModel: ObservableObject {
                     challengeHandler: { [weak self] prompt in
                         Task { @MainActor in
                             self?.authenticationChallenge = prompt
-                            self?.appendLog("De portal vraagt om aanvullende beveiligde invoer.")
+                            self?.appendLog(L10n.text("log.portal_secure_input"))
                         }
                     },
                     logHandler: { [weak self] message in
@@ -173,7 +173,7 @@ final class AppModel: ObservableObject {
                 phase = .authorizing
                 authenticationChallenge = nil
                 mfaCode = ""
-                appendLog("Authenticatie voltooid. De tunnel wacht op macOS-toestemming.")
+                appendLog(L10n.text("log.authentication_complete"))
 
                 try await service.startTunnel(
                     binary: binary,
@@ -186,16 +186,16 @@ final class AppModel: ObservableObject {
                 guard !Task.isCancelled else { throw CancellationError() }
                 phase = .connected
                 wasConnected = true
-                appendLog("De VPN-tunnel is actief.")
+                appendLog(L10n.text("log.tunnel_active"))
             } catch is CancellationError {
                 phase = .inactive
-                appendLog("Verbinden geannuleerd.")
+                appendLog(L10n.text("log.connection_cancelled"))
             } catch VPNServiceError.authenticationCancelled {
                 phase = .inactive
-                appendLog("Verbinden geannuleerd.")
+                appendLog(L10n.text("log.connection_cancelled"))
             } catch {
                 phase = .failed(error.localizedDescription)
-                appendLog("Fout: \(error.localizedDescription)")
+                appendLog(L10n.format("log.error", error.localizedDescription))
             }
 
             connectionTask = nil
@@ -212,10 +212,10 @@ final class AppModel: ObservableObject {
             try service.submitAuthenticationResponse(response)
             mfaCode = ""
             authenticationChallenge = nil
-            appendLog("MFA-code doorgegeven; de portal controleert de code.")
+            appendLog(L10n.text("log.mfa_submitted"))
         } catch {
             notice = error.localizedDescription
-            appendLog("Fout: \(error.localizedDescription)")
+            appendLog(L10n.format("log.error", error.localizedDescription))
         }
     }
 
@@ -227,7 +227,7 @@ final class AppModel: ObservableObject {
         authenticationChallenge = nil
         mfaCode = ""
         phase = .inactive
-        appendLog("Verbinden geannuleerd.")
+        appendLog(L10n.text("log.connection_cancelled"))
     }
 
     func disconnect(afterDisconnect: (() -> Void)? = nil) {
@@ -242,11 +242,11 @@ final class AppModel: ObservableObject {
                 try await service.stopTunnel()
                 phase = .inactive
                 wasConnected = false
-                appendLog("De VPN-tunnel is afgesloten.")
+                appendLog(L10n.text("log.tunnel_stopped"))
                 afterDisconnect?()
             } catch {
                 phase = .failed(error.localizedDescription)
-                appendLog("Fout: \(error.localizedDescription)")
+                appendLog(L10n.format("log.error", error.localizedDescription))
             }
 
             connectionTask = nil
@@ -263,7 +263,7 @@ final class AppModel: ObservableObject {
     func copyHomebrewCommand() {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString("brew install openconnect", forType: .string)
-        notice = "Installatiecommando gekopieerd."
+        notice = L10n.text("notice.install_command_copied")
     }
 
     func setRememberPassword(_ enabled: Bool) {
@@ -279,12 +279,12 @@ final class AppModel: ObservableObject {
                 rememberPassword = true
                 UserDefaults.standard.set(true, forKey: Keys.rememberPassword)
                 if password.isEmpty {
-                    notice = "Het wachtwoord wordt na een succesvolle aanmelding in macOS Sleutelhanger bewaard."
+                    notice = L10n.text("notice.password_save_pending")
                 }
             } catch {
                 rememberPassword = false
                 UserDefaults.standard.set(false, forKey: Keys.rememberPassword)
-                notice = "Wachtwoord onthouden kon niet worden ingeschakeld: \(error.localizedDescription)"
+                notice = L10n.format("notice.remember_enable_failed", error.localizedDescription)
             }
             return
         }
@@ -294,9 +294,9 @@ final class AppModel: ObservableObject {
             rememberPassword = false
             hasStoredPassword = false
             UserDefaults.standard.set(false, forKey: Keys.rememberPassword)
-            notice = "Het bewaarde wachtwoord is uit macOS Sleutelhanger verwijderd."
+            notice = L10n.text("notice.password_removed")
         } catch {
-            notice = "Het bewaarde wachtwoord kon niet worden verwijderd: \(error.localizedDescription)"
+            notice = L10n.format("notice.password_remove_failed", error.localizedDescription)
         }
     }
 
@@ -310,13 +310,13 @@ final class AppModel: ObservableObject {
             refreshLaunchAtLogin()
 
             if SMAppService.mainApp.status == .requiresApproval {
-                notice = "Sta de app nog toe bij Systeeminstellingen, Algemeen, Inloggen en extensies."
+                notice = L10n.text("notice.login_item_approval")
             } else {
                 notice = nil
             }
         } catch {
             refreshLaunchAtLogin()
-            notice = "Opstartinstelling kon niet worden gewijzigd: \(error.localizedDescription)"
+            notice = L10n.format("notice.login_item_failed", error.localizedDescription)
         }
     }
 
@@ -343,12 +343,12 @@ final class AppModel: ObservableObject {
             wasConnected = true
             if phase != .connected && phase != .disconnecting {
                 phase = .connected
-                appendLog("De actieve VPN-tunnel is gedetecteerd.")
+                appendLog(L10n.text("log.active_tunnel_detected"))
             }
         } else if wasConnected && !phase.isBusy {
             wasConnected = false
-            phase = .failed("De VPN-verbinding is onverwacht verbroken.")
-            appendLog("OpenConnect is niet meer actief.")
+            phase = .failed(L10n.text("error.connection_lost"))
+            appendLog(L10n.text("log.openconnect_inactive"))
         }
     }
 
@@ -368,10 +368,10 @@ final class AppModel: ObservableObject {
             try passwordStore.save(submittedPassword)
             password = submittedPassword
             hasStoredPassword = true
-            appendLog("Het wachtwoord is beveiligd opgeslagen in macOS Sleutelhanger.")
+            appendLog(L10n.text("log.password_saved"))
         } catch {
-            notice = "Het wachtwoord kon niet worden bewaard: \(error.localizedDescription)"
-            appendLog("Het wachtwoord kon niet in macOS Sleutelhanger worden bewaard.")
+            notice = L10n.format("notice.password_save_failed", error.localizedDescription)
+            appendLog(L10n.text("log.password_save_failed"))
         }
     }
 

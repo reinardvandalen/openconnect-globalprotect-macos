@@ -1,4 +1,5 @@
 import SwiftUI
+import OpenConnectCore
 
 enum ConnectionPhase: Equatable {
     case inactive
@@ -12,36 +13,36 @@ enum ConnectionPhase: Equatable {
     var title: String {
         switch self {
         case .inactive:
-            return "Niet verbonden"
+            return L10n.text("phase.inactive.title")
         case .authenticating:
-            return "Inloggen met MFA"
+            return L10n.text("phase.authenticating.title")
         case .authorizing:
-            return "Toestemming nodig"
+            return L10n.text("phase.authorizing.title")
         case .connecting:
-            return "VPN verbinden"
+            return L10n.text("phase.connecting.title")
         case .connected:
-            return "VPN actief"
+            return L10n.text("phase.connected.title")
         case .disconnecting:
-            return "Verbinding verbreken"
+            return L10n.text("phase.disconnecting.title")
         case .failed:
-            return "Verbinding mislukt"
+            return L10n.text("phase.failed.title")
         }
     }
 
     var detail: String {
         switch self {
         case .inactive:
-            return "Je internetverkeer loopt niet via GlobalProtect."
+            return L10n.text("phase.inactive.detail")
         case .authenticating:
-            return "Rond het inloggen af in je standaardbrowser."
+            return L10n.text("phase.authenticating.detail")
         case .authorizing:
-            return "macOS vraagt toestemming om de beveiligde tunnel te starten."
+            return L10n.text("phase.authorizing.detail")
         case .connecting:
-            return "OpenConnect maakt de beveiligde tunnel gereed."
+            return L10n.text("phase.connecting.detail")
         case .connected:
-            return "Je GlobalProtect-verbinding is beveiligd en actief."
+            return L10n.text("phase.connected.detail")
         case .disconnecting:
-            return "De tunnel wordt netjes afgesloten."
+            return L10n.text("phase.disconnecting.detail")
         case .failed(let message):
             return message
         }

@@ -18,29 +18,29 @@ enum VPNServiceError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .openConnectMissing:
-            return "OpenConnect is niet gevonden. Installeer het met ‘brew install openconnect’."
+            return L10n.text("error.openconnect_missing")
         case .launcherMissing:
-            return "De beveiligde tunnelstarter ontbreekt. Installeer OpenConnect VPN opnieuw."
+            return L10n.text("error.launcher_missing")
         case .authenticationFailed(let detail):
             return detail.isEmpty
-                ? "Inloggen bij GlobalProtect is mislukt."
-                : "Inloggen is mislukt: \(detail)"
+                ? L10n.text("error.authentication_failed")
+                : L10n.format("error.authentication_failed_detail", detail)
         case .authenticationCancelled:
-            return "Het inloggen is geannuleerd."
+            return L10n.text("error.authentication_cancelled")
         case .authenticationInputUnavailable:
-            return "De verificatiecode kon niet aan OpenConnect worden doorgegeven."
+            return L10n.text("error.auth_input_unavailable")
         case .authorizationCancelled:
-            return "De macOS-toestemming is geannuleerd."
+            return L10n.text("error.authorization_cancelled")
         case .privilegedCommandFailed(let detail):
             return detail.isEmpty
-                ? "macOS kon de VPN-opdracht niet uitvoeren."
-                : "De VPN-opdracht is mislukt: \(detail)"
+                ? L10n.text("error.privileged_failed")
+                : L10n.format("error.privileged_failed_detail", detail)
         case .tunnelDidNotStart:
-            return "OpenConnect meldde succes, maar de VPN-tunnel werd niet actief."
+            return L10n.text("error.tunnel_not_started")
         case .tunnelDidNotStop:
-            return "OpenConnect kon de VPN-tunnel niet volledig afsluiten."
+            return L10n.text("error.tunnel_not_stopped")
         case .supportDirectoryUnavailable:
-            return "De beveiligde werkmap van de app kon niet worden gemaakt."
+            return L10n.text("error.support_directory")
         }
     }
 }
@@ -252,9 +252,9 @@ final class VPNService: @unchecked Sendable {
                 clearAuthenticationProcess()
                 throw VPNServiceError.authenticationInputUnavailable
             }
-            logHandler("OpenConnect controleert de gebruikersnaam en het wachtwoord.")
+            logHandler(L10n.text("log.openconnect_checking_credentials"))
         } else {
-            logHandler("OpenConnect heeft de portal bereikt. Rond MFA af in de browser.")
+            logHandler(L10n.text("log.openconnect_browser_mfa"))
         }
 
         let readGroup = DispatchGroup()
@@ -281,14 +281,14 @@ final class VPNService: @unchecked Sendable {
                             try standardInput?.fileHandleForWriting.write(
                                 contentsOf: Data("\(gateway)\n".utf8)
                             )
-                            logHandler("OpenConnect heeft automatisch de enige beschikbare gateway gekozen.")
+                            logHandler(L10n.text("log.gateway_selected"))
                         } catch {
                             process.terminate()
                         }
                     case .password:
-                        challengeHandler("De portal vraagt het wachtwoord opnieuw. Controleer je inloggegevens.")
+                        challengeHandler(L10n.text("challenge.password_again"))
                     case .verification:
-                        challengeHandler("Voer de Google Authenticator-code in.")
+                        challengeHandler(L10n.text("challenge.authenticator"))
                     }
                 }
             }
@@ -389,7 +389,7 @@ final class VPNService: @unchecked Sendable {
         fi
         """
 
-        logHandler("macOS controleert de toestemming voor netwerkbeheer.")
+        logHandler(L10n.text("log.authorization_network"))
         try runWithAdministratorPrivileges(command)
 
         for _ in 0..<30 {

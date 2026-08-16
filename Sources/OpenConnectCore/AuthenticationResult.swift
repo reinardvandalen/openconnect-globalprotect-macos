@@ -7,9 +7,9 @@ public enum AuthenticationResultError: LocalizedError, Equatable {
     public var errorDescription: String? {
         switch self {
         case .missingCookie:
-            return "OpenConnect heeft na het inloggen geen VPN-cookie teruggegeven."
+            return L10n.text("error.auth_missing_cookie")
         case .missingServer:
-            return "OpenConnect heeft na het inloggen geen VPN-server teruggegeven."
+            return L10n.text("error.auth_missing_server")
         }
     }
 }

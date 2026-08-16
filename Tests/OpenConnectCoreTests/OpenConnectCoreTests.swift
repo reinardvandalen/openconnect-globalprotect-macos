@@ -3,6 +3,32 @@ import XCTest
 @testable import OpenConnectCore
 
 final class OpenConnectCoreTests: XCTestCase {
+    func testInterfaceTranslationsAreAvailable() {
+        XCTAssertEqual(L10n.supportedLanguages, ["en", "nl", "de"])
+        XCTAssertEqual(L10n.text("phase.inactive.title", language: "en"), "Not connected")
+        XCTAssertEqual(L10n.text("phase.inactive.title", language: "nl"), "Niet verbonden")
+        XCTAssertEqual(L10n.text("phase.inactive.title", language: "de"), "Nicht verbunden")
+
+        let representativeKeys = [
+            "app.subtitle",
+            "field.username.label",
+            "toggle.remember.title",
+            "button.connect",
+            "error.endpoint_invalid",
+            "error.authentication_failed"
+        ]
+
+        for language in L10n.supportedLanguages {
+            for key in representativeKeys {
+                XCTAssertNotEqual(
+                    L10n.text(key, language: language),
+                    key,
+                    "Missing \(language) translation for \(key)"
+                )
+            }
+        }
+    }
+
     func testNormalizesHostnameToHTTPS() throws {
         let url = try VPNEndpoint.normalize("vpn.example.nl")
         XCTAssertEqual(url.absoluteString, "https://vpn.example.nl")
@@ -117,6 +143,13 @@ final class OpenConnectCoreTests: XCTestCase {
             detector.append("Please enter the Google Authenticator Token Code\nUitdaging: "),
             [.verification]
         )
+    }
+
+    func testDetectsGermanAuthenticationPrompts() {
+        var detector = AuthenticationPromptDetector()
+
+        XCTAssertEqual(detector.append("Passwort: "), [.password])
+        XCTAssertEqual(detector.append("Verifizierungscode: "), [.verification])
     }
 
     func testDetectsSingleGatewaySelection() {

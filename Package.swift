@@ -4,6 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "OpenConnectVPN",
+    defaultLocalization: "en",
     platforms: [
         .macOS(.v14)
     ],
@@ -15,7 +16,10 @@ let package = Package(
     targets: [
         .target(
             name: "OpenConnectCore",
-            path: "Sources/OpenConnectCore"
+            path: "Sources/OpenConnectCore",
+            resources: [
+                .process("Resources")
+            ]
         ),
         .executableTarget(
             name: "OpenConnectVPN",

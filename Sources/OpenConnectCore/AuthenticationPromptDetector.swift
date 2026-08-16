@@ -21,12 +21,17 @@ public struct AuthenticationPromptDetector: Sendable {
         Marker(text: "passcode:", prompt: .verification),
         Marker(text: "challenge:", prompt: .verification),
         Marker(text: "uitdaging:", prompt: .verification),
+        Marker(text: "herausforderung:", prompt: .verification),
         Marker(text: "response:", prompt: .verification),
         Marker(text: "antwoord:", prompt: .verification),
+        Marker(text: "antwort:", prompt: .verification),
         Marker(text: "token:", prompt: .verification),
         Marker(text: "otp:", prompt: .verification),
         Marker(text: "password:", prompt: .password),
-        Marker(text: "wachtwoord:", prompt: .password)
+        Marker(text: "wachtwoord:", prompt: .password),
+        Marker(text: "passwort:", prompt: .password),
+        Marker(text: "verifizierungscode:", prompt: .verification),
+        Marker(text: "einmalpasswort:", prompt: .verification)
     ]
 
     private var text = ""

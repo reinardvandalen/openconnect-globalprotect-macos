@@ -9,13 +9,13 @@ public enum VPNEndpointError: LocalizedError, Equatable {
     public var errorDescription: String? {
         switch self {
         case .empty:
-            return "Vul het adres van je GlobalProtect-portal in."
+            return L10n.text("error.endpoint_empty")
         case .invalid:
-            return "Dit is geen geldig GlobalProtect-adres."
+            return L10n.text("error.endpoint_invalid")
         case .insecureScheme:
-            return "Gebruik een beveiligd https-adres."
+            return L10n.text("error.endpoint_insecure")
         case .credentialsInURL:
-            return "Zet geen gebruikersnaam of wachtwoord in het VPN-adres."
+            return L10n.text("error.endpoint_credentials")
         }
     }
 }
